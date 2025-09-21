@@ -116,38 +116,41 @@ async function startAudio() {
   if (!mic) {
     if (typeof require !== 'undefined') {
       try {
-        const constraints = {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
           audio: {
-            mandatory: {
-              chromeMediaSource: 'desktop'
-            }
-          },
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop'
-            }
+            echoCancellation: false,
+            noiseSuppression: false,
+            sampleRate: 44100
           }
-        };
+        });
 
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        const audioTracks = stream.getAudioTracks();
+        if (audioTracks.length === 0) {
+          throw new Error('No audio track found in screen capture');
+        }
 
         const audioContext = getAudioContext();
         const source = audioContext.createMediaStreamSource(stream);
 
         mic = new p5.AudioIn();
+        mic.input = source;
         mic.stream = stream;
-        mic.mediaStream = source;
         mic.enabled = true;
 
-        fft.setInput(mic);
-        amplitude.setInput(mic);
+        fft = new p5.FFT(0.8, 512);
+        amplitude = new p5.Amplitude();
+
+        fft.setInput(source);
+        amplitude.setInput(source);
 
         const videoTrack = stream.getVideoTracks()[0];
         if (videoTrack) videoTrack.stop();
 
-        console.log('System audio capture started');
+        console.log('System audio capture started via getDisplayMedia');
       } catch (err) {
         console.error('Error capturing system audio:', err);
+        console.log('Falling back to microphone input');
         mic = new p5.AudioIn();
         mic.start();
         fft.setInput(mic);
@@ -355,6 +358,42 @@ function drawConversationFlow(spectrum, level) {
 function switchMode() {
   mode = (mode + 1) % 4;
   background(PALETTE.bg);
+}
+
+function testSystemAudio() {
+  navigator.mediaDevices.getDisplayMedia({
+    video: true,
+    audio: true
+  })
+  .then(stream => {
+    document.getElementById('debug').innerHTML =
+      `Audio tracks: ${stream.getAudioTracks().length}<br>
+       Video tracks: ${stream.getVideoTracks().length}<br>
+       Audio track label: ${stream.getAudioTracks()[0]?.label || 'none'}`;
+
+    if (stream.getAudioTracks().length > 0) {
+      console.log('System audio captured successfully!');
+
+      // Try to use this stream directly
+      const audioContext = getAudioContext();
+      const source = audioContext.createMediaStreamSource(stream);
+
+      fft = new p5.FFT(0.8, 512);
+      amplitude = new p5.Amplitude();
+
+      fft.setInput(source);
+      amplitude.setInput(source);
+
+      mic = { enabled: true, stream: stream };
+
+      // Stop video track
+      stream.getVideoTracks().forEach(track => track.stop());
+    }
+  })
+  .catch(err => {
+    document.getElementById('debug').innerHTML = `Error: ${err.message}`;
+    console.error('Screen capture error:', err);
+  });
 }
 
 function windowResized() {
