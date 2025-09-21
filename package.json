@@ -1,0 +1,12 @@
+{
+  "name": "p5-audio-visualizer",
+  "version": "1.0.0",
+  "description": "Albuquerque sunset cyberpunk audio visualizer for Logic Pro audio",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "serve": "npx live-server --port=8000"
+  },
+  "keywords": ["p5js", "audio", "visualizer", "logic-pro"],
+  "author": "",
+  "license": "MIT"
+}

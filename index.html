@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audio Visualizer - Albuquerque Sunset</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/addons/p5.sound.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #0a0a0a;
+    }
+    #controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 10px;
+    }
+    button {
+      background: rgba(255, 94, 77, 0.1);
+      color: #ff5e4d;
+      border: 1px solid #ff5e4d;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-family: monospace;
+      transition: all 0.3s;
+    }
+    button:hover {
+      background: rgba(255, 94, 77, 0.3);
+      box-shadow: 0 0 10px #ff5e4d;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <button onclick="startAudio()">Start Audio</button>
+    <button onclick="switchMode()">Switch Mode</button>
+  </div>
+  <script src="sketch.js"></script>
+</body>
+</html>
