@@ -112,12 +112,53 @@ function setup() {
   background(PALETTE.bg);
 }
 
-function startAudio() {
+async function startAudio() {
   if (!mic) {
-    mic = new p5.AudioIn();
-    mic.start();
-    fft.setInput(mic);
-    amplitude.setInput(mic);
+    if (typeof require !== 'undefined') {
+      try {
+        const constraints = {
+          audio: {
+            mandatory: {
+              chromeMediaSource: 'desktop'
+            }
+          },
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop'
+            }
+          }
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        const audioContext = getAudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+
+        mic = new p5.AudioIn();
+        mic.stream = stream;
+        mic.mediaStream = source;
+        mic.enabled = true;
+
+        fft.setInput(mic);
+        amplitude.setInput(mic);
+
+        const videoTrack = stream.getVideoTracks()[0];
+        if (videoTrack) videoTrack.stop();
+
+        console.log('System audio capture started');
+      } catch (err) {
+        console.error('Error capturing system audio:', err);
+        mic = new p5.AudioIn();
+        mic.start();
+        fft.setInput(mic);
+        amplitude.setInput(mic);
+      }
+    } else {
+      mic = new p5.AudioIn();
+      mic.start();
+      fft.setInput(mic);
+      amplitude.setInput(mic);
+    }
   }
 }
 

@@ -2,11 +2,28 @@
   "name": "p5-audio-visualizer",
   "version": "1.0.0",
   "description": "Albuquerque sunset cyberpunk audio visualizer for Logic Pro audio",
+  "main": "main.js",
   "scripts": {
-    "start": "python3 -m http.server 8000",
-    "serve": "npx live-server --port=8000"
+    "start": "electron .",
+    "web": "python3 -m http.server 8000",
+    "serve": "npx live-server --port=8000",
+    "dist": "electron-builder"
   },
-  "keywords": ["p5js", "audio", "visualizer", "logic-pro"],
+  "keywords": ["p5js", "audio", "visualizer", "logic-pro", "electron"],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.p5.audiovisualizer",
+    "productName": "Audio Visualizer",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.music"
+    }
+  }
 }
