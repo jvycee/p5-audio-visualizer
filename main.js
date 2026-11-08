@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, systemPreferences } = require('electron');
 const path = require('path');
+const { windowRefAfterPermission } = require('./shell-state');
 
 let mainWindow;
 
@@ -29,9 +30,14 @@ app.whenReady().then(() => {
     const status = systemPreferences.getMediaAccessStatus('microphone');
     if (status !== 'granted') {
       systemPreferences.askForMediaAccess('microphone').then((granted) => {
-        if (granted) {
+        const outcome = windowRefAfterPermission(granted);
+        if (outcome === 'create-window') {
           createWindow();
+        } else {
+          mainWindow = outcome;
         }
+      }).catch(() => {
+        mainWindow = windowRefAfterPermission(false);
       });
     } else {
       createWindow();
